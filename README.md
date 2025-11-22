@@ -6,6 +6,7 @@ This setup includes:
 - **Ollama** — the backend LLM engine  
 - **Nginx** — reverse proxy for HTTP/HTTPS  
 - **Certbot** — automated certificate generation (optional HTTPS)
+- **OpenWebUI** — WebUI for ChatGPT like platformn (HTTPS)
 
 The environment is prepared using `setup.sh`, which builds and launches all necessary containers.
 
@@ -28,6 +29,7 @@ The system spawns the following services:
 | `llm-nginx`    | `nginx:alpine`         | Reverse proxy (HTTP/HTTPS) |
 | `llm-certbot`  | `certbot/certbot`      | SSL certificate handling    |
 | `llm-ollama`   | `ollama/ollama:latest` | LLM backend engine          |
+| `llm-open-webui`| `open-webui`        | ChatUI Platform             |
 
 ---
 

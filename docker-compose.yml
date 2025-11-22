@@ -67,3 +67,20 @@ services:
       - NVIDIA_VISIBLE_DEVICES=all
     networks:
       - llm-network
+
+  # ------------------------------------------------------------
+  # 4. Open WebUI (The Chat Interface)
+  # ------------------------------------------------------------
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: llm-open-webui
+    restart: unless-stopped
+    volumes:
+      - ./open-webui-data:/app/backend/data
+    environment:
+      # Use the container_name of your ollama service
+      - OLLAMA_BASE_URL=http://llm-ollama:11434
+      - WEBUI_AUTH=false
+      - WEBUI_NAME="Open WebUI Chat AI"
+    networks:
+      - llm-network

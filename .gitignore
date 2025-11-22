@@ -1,3 +1,4 @@
-ollama_data/
 .env
 nginx/nginx.conf
+ollama_data/
+open-webui-data/

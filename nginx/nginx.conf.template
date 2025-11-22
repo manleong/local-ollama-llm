@@ -22,7 +22,7 @@ http {
     # --- HTTP Redirect ---
     server {
         listen 80;
-        server_name ${DOMAIN};  # <--- Placeholder
+        server_name ${DOMAIN};
 
         location /.well-known/acme-challenge/ {
             root /var/www/certbot;
@@ -36,18 +36,17 @@ http {
     # --- HTTPS Server ---
     server {
         listen 443 ssl;
-        server_name ${DOMAIN};  # <--- Placeholder
+        server_name ${DOMAIN};
 
         # Dynamic Certificate Paths
         ssl_certificate /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
         ssl_certificate_key /etc/letsencrypt/live/${DOMAIN}/privkey.pem;
-        
         ssl_protocols TLSv1.2 TLSv1.3;
         ssl_ciphers HIGH:!aNULL:!MD5;
 
         location /v1/ {
-            proxy_pass http://llm-ollama:11434; # Pointing to service name
-            
+            proxy_pass http://llm-ollama:11434;
+
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -58,8 +57,21 @@ http {
         }
 
         location / {
-            return 200 'LLM Server is Online at ${DOMAIN}';
-            add_header Content-Type text/plain;
+            proxy_pass http://llm-open-webui:8080;
+
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            # --- WEBSOCKET SUPPORT (Required for OpenWebUI) ---
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            
+            # Disable buffering for streaming responses
+            proxy_buffering off;
+            proxy_read_timeout 300s; # Increase timeout for long generations
         }
     }
 }
