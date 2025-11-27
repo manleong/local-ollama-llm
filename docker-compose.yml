@@ -65,6 +65,7 @@ services:
       - OLLAMA_ORIGINS="*"
       - OLLAMA_KEEP_ALIVE=24h
       - NVIDIA_VISIBLE_DEVICES=all
+      - OLLAMA_NUM_CTX=16384
     networks:
       - llm-network
 
@@ -82,5 +83,23 @@ services:
       - OLLAMA_BASE_URL=http://llm-ollama:11434
       - WEBUI_AUTH=false
       - WEBUI_NAME="Open WebUI Chat AI"
+    networks:
+      - llm-network
+
+  # ------------------------------------------------------------
+  # 5. Watchtower (The Auto-Updater)
+  # ------------------------------------------------------------
+  watchtower:
+    image: containrrr/watchtower
+    container_name: llm-watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ=Asia/Kuala_Lumpur
+      - WATCHTOWER_DEBUG=true
+      - DOCKER_API_VERSION=1.52
+    # Daily check at 4:00 AM local server time
+    command: --schedule "0 0 4 * * *" --cleanup
     networks:
       - llm-network
